@@ -1,0 +1,7 @@
+[project]
+name = "unsw-course-graph"
+version = "0.1.0"
+description = "Makes a graph of all UNSW courses"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["beautifulsoup4>=4.12.3", "requests>=2.32.3"]

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>UNSW Course Map</title>
+  </head>
+  <body style="background-color: black">
+    <div id="container" style="width: 100vw; height: 100vh"></div>
+    <script id="data" type="application/json">
+      {{ data }}
+    </script>
+    <script type="module">
+      import Sigma from "https://cdn.jsdelivr.net/npm/sigma@3.0.1/+esm";
+      import { Graph } from "https://cdn.jsdelivr.net/npm/graphology@0.25.4/+esm";
+      import { circular } from "https://cdn.jsdelivr.net/npm/graphology-layout@0.6.1/+esm";
+      import FA2Layout from "https://cdn.jsdelivr.net/npm/graphology-layout-forceatlas2@0.10.1/worker.js/+esm";
+      import forceAtlas2 from "https://cdn.jsdelivr.net/npm/graphology-layout-forceatlas2@0.10.1/+esm";
+
+      // https://stackoverflow.com/a/44134328
+      function hslToHex(h, s, l) {
+        l /= 100;
+        const a = (s * Math.min(l, 1 - l)) / 100;
+        const f = (n) => {
+          const k = (n + h / 30) % 12;
+          const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+          return Math.round(255 * color)
+            .toString(16)
+            .padStart(2, "0");
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+      }
+
+      const data = JSON.parse(document.getElementById("data").textContent);
+
+      const graph = new Graph();
+      const colorMap = new Map();
+
+      function addNode(code, label) {
+        const category = code.substring(0, 4);
+
+        if (!colorMap.has(category)) {
+          const hue = Math.floor(Math.random() * 360);
+          colorMap.set(category, hslToHex(hue, 100, 50));
+        }
+
+        graph.addNode(code, {
+          label,
+          color: colorMap.get(category),
+        });
+      }
+
+      for (const { code, title } of data) {
+        addNode(code, `${code} - ${title}`);
+      }
+
+      for (const { code, prereqs } of data) {
+        for (const prereq of prereqs) {
+          if (!graph.hasNode(prereq)) {
+            console.warn(`Node ${prereq} not found - adding`);
+            addNode(prereq, prereq);
+          }
+
+          graph.addEdge(prereq, code, {
+            color: "gray",
+            type: "arrow",
+          });
+        }
+      }
+
+      circular.assign(graph);
+      const layout = new FA2Layout(graph, {
+        settings: forceAtlas2.inferSettings(graph),
+      });
+      layout.start();
+
+      const sigma = new Sigma(graph, document.getElementById("container"), {
+        labelColor: { color: "gray" },
+      });
+
+      sigma.on("clickNode", ({ node }) => {
+        window.open(
+          `https://www.handbook.unsw.edu.au/undergraduate/courses/2025/${node}`,
+          "_blank",
+        );
+      });
+    </script>
+  </body>
+</html>
