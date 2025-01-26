@@ -2,18 +2,11 @@
 
 ## Usage
 
-1. Make sure Python and `pip` are installed.
-2. Install the required packages:
-
-```sh
-pip install -r requirements.txt
-```
-
-3. Run `fetch_course_data.py` and wait for it to complete.
-4. Run `scrape_prerequisites.py` and wait for it to complete. This will take a
+1. Run `fetch_course_data.py` and wait for it to complete.
+2. Run `scrape_prerequisites.py` and wait for it to complete. This will take a
    while (> 40 min), since UNSW ratelimits requests to their handbook.
-5. Run `make_graph.py`.
-6. Open the generated `graph.html` file in a browser.
+3. Run `make_graph.py`.
+4. Open the generated `graph.html` file in a browser.
 
 ## How it works
 
