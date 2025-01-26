@@ -38,14 +38,14 @@ def get_prerequisites(course_id: str):
 def scrape_prerequisites_bulk(course_codes):
     out = {}
     for i, code in enumerate(course_codes):
-        print(f"Fetching prerequisites for {code} ({i + 1}/{len(course_codes)})")
+        print(f"Scraping prerequisites for {code} ({i + 1}/{len(course_codes)})")
         while True:
             try:
                 prereqs = get_prerequisites(code)
                 out[code] = prereqs
                 break
             except Exception as e:
-                print(f"Error fetching prerequisites for {code}: {e}")
+                print(f"Error scraping prerequisites for {code}: {e}")
                 print("Waiting 1 minute before retrying...")
                 sleep(60)
                 print("Retrying...")
