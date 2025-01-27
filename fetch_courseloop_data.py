@@ -1,18 +1,19 @@
 import requests
 import json
+import sys
 
 
-def fetch_course_data():
+def fetch_all(contenttype: str, display_name: str):
     start = 0
-    courses = {}
+    out = {}
     while True:
-        print(f"Fetching course data (currently at {start})")
+        print(f"Fetching all {display_name} (currently at {start})")
         res = requests.post(
             "https://api-ap-southeast-2.prod.courseloop.com/publisher/search-academic-items",
             json={
                 "siteId": "unsw-prod-pres",
                 "query": "",
-                "contenttype": "subject",
+                "contenttype": contenttype,
                 "searchFilters": [
                     {
                         "filterField": "studyLevelValue",
@@ -40,18 +41,35 @@ def fetch_course_data():
         if len(data) == 0:
             break
 
-        for course in data:
-            courses[course["code"]] = course["title"]
+        for item in data:
+            out[item["code"]] = item["title"]
 
         start += 100
 
-    return courses
+    return out
 
 
 def main():
-    courses = fetch_course_data()
-    with open("courses.json", "w") as f:
-        json.dump(courses, f, indent=2)
+    if len(sys.argv) != 2:
+        print("Usage: fetch_courseloop_data.py (courses | specialisations)")
+        exit(1)
+
+    data_type = sys.argv[1]
+    contenttype = ""
+    match data_type:
+        case "courses":
+            contenttype = "subject"
+        case "specialisations":
+            contenttype = "aos"
+        case _:
+            print(
+                f"Unknown data type: {data_type} (must be one of 'courses' or 'specialisations')"
+            )
+            exit(1)
+
+    data = fetch_all(contenttype, data_type)
+    with open(f"{data_type}.json", "w") as f:
+        json.dump(data, f, indent=2)
 
 
 if __name__ == "__main__":

@@ -59,7 +59,7 @@ def main():
         courses = json.load(f)
 
     prereq_data = scrape_prerequisites_bulk(courses.keys())
-    with open("prereqs.json", "w") as f:
+    with open("course-prerequisites.json", "w") as f:
         json.dump(prereq_data, f, indent=2)
 
 

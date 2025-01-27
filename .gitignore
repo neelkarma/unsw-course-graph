@@ -9,7 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-# generated files
+# code-generated files
+course-prereqs.json
 courses.json
-prereqs.json
-graph.html
+specialisations.json
+specialisation-courses.json
